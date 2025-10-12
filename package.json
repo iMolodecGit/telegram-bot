@@ -1,0 +1,24 @@
+{
+  "name": "telegram-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.ts",
+    "start": "node index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^24.7.1",
+    "dotenv": "^17.2.3",
+    "mysql2": "^3.15.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@types/node-telegram-bot-api": "^0.64.11",
+    "i": "^0.3.7"
+  }
+}
