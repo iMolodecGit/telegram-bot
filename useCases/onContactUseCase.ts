@@ -1,4 +1,4 @@
-import {iContact, iUseCase} from "../core/interfaces";
+import {iContact, iReporitory, iUseCase} from "../core/interfaces";
 import TelegramBot from "node-telegram-bot-api";
 import {UserMapper} from "../core/mappers/user.mapper";
 import {UserEntity} from "../core/entities/user.entity";
@@ -6,8 +6,8 @@ import {UserEntity} from "../core/entities/user.entity";
 export class onContactUseCase implements iUseCase {
 
   private readonly _bot: TelegramBot;
-  private readonly _userRepository;
-  constructor(bot: TelegramBot, userRepository: any) {
+  private readonly _userRepository: iReporitory;
+  constructor(bot: TelegramBot, userRepository: iReporitory) {
     this._bot = bot;
     this._userRepository = userRepository;
   }

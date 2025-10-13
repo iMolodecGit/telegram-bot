@@ -68,7 +68,9 @@ export interface iUseCase{
 }
 
 export interface iReporitory {
+  findOneByChatId: any;
   getAll: any,
   save: any,
+  updatePhoto: any,
 }
 

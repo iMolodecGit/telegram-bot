@@ -1,12 +1,17 @@
-import {iContact, iMessage, iUseCase} from "../core/interfaces";
+import {iMessage, iReporitory, iUseCase} from "../core/interfaces";
 import TelegramBot from "node-telegram-bot-api";
+import fs from "fs";
+import {UserMapper} from "../core/mappers/user.mapper";
+import {UserEntity} from "../core/entities/user.entity";
 
 export class onTextUseCase implements iUseCase {
 
-  private _bot: TelegramBot
+  private _bot: TelegramBot;
+  private readonly _userRepository: iReporitory;
 
-  constructor(bot: TelegramBot) {
+  constructor(bot: TelegramBot, userRepository: iReporitory ) {
     this._bot = bot;
+    this._userRepository = userRepository;
   }
 
   async execute(msg: iMessage) {
@@ -20,8 +25,10 @@ export class onTextUseCase implements iUseCase {
         await this.helpAction(msg);
       } else if (msg.text == '/menu') {
         await this.menuAction(msg);
-      } else if (msg.text == '❌ Закрыть меню') {
+      } else if (msg.text == '❌ Close menu') {
         await this.closeMenuAction(msg);
+      } else if (msg.text == '⭐️ Image') {
+        await this.sendImg(msg);
       } else {
         await this.processDefaultText(msg)
       }
@@ -67,10 +74,9 @@ export class onTextUseCase implements iUseCase {
     await this._bot.sendMessage(msg.chat.id, `Меню бота`, {
       reply_markup: {
         keyboard: [
-          // ['⭐️ Картинка', '⭐️ Видео'],
-          // ['⭐️ Аудио', '⭐️ Голосовое сообщение'],
-          [{text: '⭐️ Контакт', request_contact: true}, {text: '⭐️ Геолокация', request_location: true}],
-          [{text: '❌ Закрыть меню'}]
+          [{text: '⭐️ Image'}],
+          [{text: '⭐️ Contact', request_contact: true}, {text: '⭐️ Location', request_location: true}],
+          [{text: '❌ Close menu'}]
         ],
         resize_keyboard: true
       }
@@ -83,5 +89,40 @@ export class onTextUseCase implements iUseCase {
         remove_keyboard: true
       }
     })
+  }
+
+  private async sendImg(msg:iMessage) {
+    let dbData = await this._userRepository.findOneByChatId(msg.chat.id);
+
+
+    if (!dbData.length) {
+      console.log('Not found User by chatId', msg.chat.id);
+      return;
+    }
+
+    let user: UserEntity = UserMapper.toEntity(dbData[0]);
+
+    const baseDir = './photo';
+    const fileName = user.photo_1;
+
+    if (!fileName) {
+      console.log('Photo is empty. Chat id: ', msg.chat.id, 'User name', msg.from.username);
+    }
+    const filePath = `${baseDir}/${msg.chat.id}/${fileName}`;
+
+    try {
+      fs.accessSync(filePath);
+      const imageBuffer = fs.readFileSync(filePath);
+      await this._bot.sendPhoto(msg.chat.id, imageBuffer, {
+        caption: '<b>Your image is here</b>',
+        parse_mode: 'HTML'
+      });
+    } catch {
+      console.log('Photo is forbidden. Chat id: ', msg.chat.id, 'User name', msg.from.username);
+      await this._bot.sendMessage(msg.chat.id, '<b>Oops! Your image is not found</b>', {
+        parse_mode: 'HTML'
+      });
+    }
+
   }
 }
