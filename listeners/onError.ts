@@ -1,11 +1,12 @@
 
-import {iError, iMessage, iOnListener,} from "../core/interfaces";
+import {iOnListener,} from "../core/interfaces";
+import TelegramBot from "node-telegram-bot-api";
 
 export class onError implements iOnListener {
-  private readonly bot;
+  private readonly telegramBot: TelegramBot;
 
-  constructor(bot: any) {
-    this.bot = bot;
+  constructor(bot: TelegramBot) {
+    this.telegramBot = bot;
     this.setListener();
   }
 
@@ -13,6 +14,6 @@ export class onError implements iOnListener {
     this.setPollingErrorListener();
   }
   private setPollingErrorListener() {
-    this.bot.on("polling_error", (err: iError) => console.log(err.data?.error.message));
+    this.telegramBot.on("polling_error", (err: Error) => console.log(err.message));
   }
 }

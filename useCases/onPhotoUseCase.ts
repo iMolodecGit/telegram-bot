@@ -1,15 +1,15 @@
-import { iReporitory, iUseCase} from "../core/interfaces";
+import { iRepository, iUseCase} from "../core/interfaces";
 import TelegramBot, {Message, Metadata, PhotoSize} from "node-telegram-bot-api";
 import fs from "fs";
 
 const baseDir = `photo`;
 export class onPhotoUseCase implements iUseCase {
 
-  private readonly _bot: TelegramBot;
-  private readonly _userRepository: iReporitory;
-  constructor(bot: TelegramBot, userRepository: iReporitory) {
-    this._bot = bot;
-    this._userRepository = userRepository;
+  private readonly telegramBot: TelegramBot;
+  private readonly userRepository: iRepository;
+  constructor(bot: TelegramBot, userRepository: iRepository) {
+    this.telegramBot = bot;
+    this.userRepository = userRepository;
   }
 
   async execute(msg: Message, metadata: Metadata) {
@@ -28,14 +28,14 @@ export class onPhotoUseCase implements iUseCase {
         return;
       }
 
-      let result = await this._userRepository.updatePhoto(msg.chat.id, fileName);
+      let result = await this.userRepository.updatePhoto(msg.chat.id, fileName);
 
       if (result) {
         console.log(`File saved from ${msg.chat.first_name} saved. Chat Id ${msg.chat.id}`);
       } else {
         console.error(`Error during file save from ${msg.chat.first_name}. Chat Id ${msg.chat.id}`);
       }
-      await this._bot.sendMessage(msg.chat.id, `Your photo saved!`);
+      await this.telegramBot.sendMessage(msg.chat.id, `Your photo saved!`);
     }
     catch(error) {
       console.log(error);
@@ -55,7 +55,7 @@ export class onPhotoUseCase implements iUseCase {
 
       let fileId = photo.file_id;
 
-      let filePath = await this._bot.downloadFile(fileId, dir);
+      let filePath = await this.telegramBot.downloadFile(fileId, dir);
 
       let filePathStructure = filePath.split('/');
       fileName = filePathStructure[filePathStructure.length - 1];

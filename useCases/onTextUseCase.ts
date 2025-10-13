@@ -1,23 +1,23 @@
-import {iMessage, iReporitory, iUseCase} from "../core/interfaces";
-import TelegramBot from "node-telegram-bot-api";
+import {iRepository, iUseCase} from "../core/interfaces";
+import TelegramBot, {Message} from "node-telegram-bot-api";
 import fs from "fs";
 import {UserMapper} from "../core/mappers/user.mapper";
 import {UserEntity} from "../core/entities/user.entity";
 
 export class onTextUseCase implements iUseCase {
 
-  private _bot: TelegramBot;
-  private readonly _userRepository: iReporitory;
+  private telegramBot: TelegramBot;
+  private readonly userRepository: iRepository;
 
-  constructor(bot: TelegramBot, userRepository: iReporitory ) {
-    this._bot = bot;
-    this._userRepository = userRepository;
+  constructor(bot: TelegramBot, userRepository: iRepository ) {
+    this.telegramBot = bot;
+    this.userRepository = userRepository;
   }
 
-  async execute(msg: iMessage) {
+  async execute(msg: Message) {
 
     try {
-      if (msg.text.startsWith('/start')) {
+      if (msg.text?.startsWith('/start')) {
         await this.startAction(msg);
       } else if (msg.text == '/ref') {
         await this.refAction(msg);
@@ -37,41 +37,43 @@ export class onTextUseCase implements iUseCase {
     }
   }
 
-  private async processDefaultText(msg: iMessage) {
+  private async processDefaultText(msg: Message) {
     console.log(msg);
-    const msgWait = await this._bot.sendMessage(msg.chat.id, `Бот генерирует ответ...`);
+    let text: string = msg.text ?? '';
+    const msgWait = await this.telegramBot.sendMessage(msg.chat.id, `Бот генерирует ответ...`);
 
     setTimeout(async () => {
-      await this._bot.deleteMessage(msgWait.chat.id, msgWait.message_id);
-      await this._bot.sendMessage(msg.chat.id, msg.text);
+      await this.telegramBot.deleteMessage(msgWait.chat.id, msgWait.message_id);
+      await this.telegramBot.sendMessage(msg.chat.id, text);
     }, 2500);
   }
 
-  private async startAction(msg: iMessage) {
-    await this._bot.sendMessage(msg.chat.id, `You start the iMolodec bot!`);
+  private async startAction(msg: Message) {
+    await this.telegramBot.sendMessage(msg.chat.id, `You start the iMolodec bot!`);
 
-    if (msg.text.length > 6) {
-      const refID = msg.text.slice(7);
-      await this._bot.sendMessage(msg.chat.id, `You've opened the bot by ref from user ID ${refID}`);
+    let text: string = msg.text ?? '';
+    if (text.length > 6) {
+      const refID = text.slice(7);
+      await this.telegramBot.sendMessage(msg.chat.id, `You've opened the bot by ref from user ID ${refID}`);
     }
   }
 
-  private async refAction(msg: iMessage) {
-    await this._bot.sendMessage(msg.chat.id, `${process.env.URL_TO_BOT}?start=${msg.from.id}`);
+  private async refAction(msg: Message) {
+    await this.telegramBot.sendMessage(msg.chat.id, `${process.env.URL_TO_BOT}?start=${msg.from?.id}`);
   }
 
-  private async helpAction(msg: iMessage) {
-    await this._bot.sendMessage(msg.chat.id, `Раздел помощи HTML\n\n<b>Жирный Текст</b>\n<i>Текст Курсивом</i>\n<code>Текст с Копированием</code>\n<s>Перечеркнутый текст</s>\n<u>Подчеркнутый текст</u>\n<pre language='c++'>код на c++</pre>\n<a href='t.me'>Гиперссылка</a>`, {
+  private async helpAction(msg: Message) {
+    await this.telegramBot.sendMessage(msg.chat.id, `Раздел помощи HTML\n\n<b>Жирный Текст</b>\n<i>Текст Курсивом</i>\n<code>Текст с Копированием</code>\n<s>Перечеркнутый текст</s>\n<u>Подчеркнутый текст</u>\n<pre language='c++'>код на c++</pre>\n<a href='t.me'>Гиперссылка</a>`, {
       parse_mode: "HTML"
     });
 
-    await this._bot.sendMessage(msg.chat.id, 'Раздел помощи Markdown\n\n*Жирный Текст*\n_Текст Курсивом_\n`Текст с Копированием`\n~Перечеркнутый текст~\n``` код ```\n||скрытый текст||\n[Гиперссылка](t.me)', {
+    await this.telegramBot.sendMessage(msg.chat.id, 'Раздел помощи Markdown\n\n*Жирный Текст*\n_Текст Курсивом_\n`Текст с Копированием`\n~Перечеркнутый текст~\n``` код ```\n||скрытый текст||\n[Гиперссылка](t.me)', {
       parse_mode: "MarkdownV2"
     });
   }
 
-  private async menuAction(msg: iMessage) {
-    await this._bot.sendMessage(msg.chat.id, `Меню бота`, {
+  private async menuAction(msg: Message) {
+    await this.telegramBot.sendMessage(msg.chat.id, `Меню бота`, {
       reply_markup: {
         keyboard: [
           [{text: '⭐️ Image'}],
@@ -83,16 +85,16 @@ export class onTextUseCase implements iUseCase {
     })
   }
 
-  private async closeMenuAction(msg: iMessage) {
-    await this._bot.sendMessage(msg.chat.id, 'Меню закрыто', {
+  private async closeMenuAction(msg: Message) {
+    await this.telegramBot.sendMessage(msg.chat.id, 'Меню закрыто', {
       reply_markup: {
         remove_keyboard: true
       }
     })
   }
 
-  private async sendImg(msg:iMessage) {
-    let dbData = await this._userRepository.findOneByChatId(msg.chat.id);
+  private async sendImg(msg: Message) {
+    let dbData = await this.userRepository.findOneByChatId(msg.chat.id);
 
 
     if (!dbData.length) {
@@ -106,20 +108,25 @@ export class onTextUseCase implements iUseCase {
     const fileName = user.photo_1;
 
     if (!fileName) {
-      console.log('Photo is empty. Chat id: ', msg.chat.id, 'User name', msg.from.username);
+      console.log('Photo is empty. Chat id: ', msg.chat.id, 'User name', msg.from?.username);
     }
     const filePath = `${baseDir}/${msg.chat.id}/${fileName}`;
 
     try {
       fs.accessSync(filePath);
       const imageBuffer = fs.readFileSync(filePath);
-      await this._bot.sendPhoto(msg.chat.id, imageBuffer, {
+      await this.telegramBot.sendPhoto(msg.chat.id, imageBuffer, {
         caption: '<b>Your image is here</b>',
         parse_mode: 'HTML'
+      },{
+        // Explicitly specify the file name.
+        filename: 'image.jpg',
+        // Explicitly specify the MIME type.
+        contentType: 'image/jpg',
       });
     } catch {
-      console.log('Photo is forbidden. Chat id: ', msg.chat.id, 'User name', msg.from.username);
-      await this._bot.sendMessage(msg.chat.id, '<b>Oops! Your image is not found</b>', {
+      console.log('Photo is forbidden. Chat id: ', msg.chat.id, 'User name', msg.from?.username);
+      await this.telegramBot.sendMessage(msg.chat.id, '<b>Oops! Your image is not found</b>', {
         parse_mode: 'HTML'
       });
     }

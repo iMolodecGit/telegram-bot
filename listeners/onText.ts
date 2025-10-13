@@ -1,21 +1,21 @@
 
-import {iOnListener, iReporitory, iUseCase,} from "../core/interfaces";
+import {iOnListener, iRepository, iUseCase,} from "../core/interfaces";
 import TelegramBot from "node-telegram-bot-api";
 import {onTextUseCase} from "../useCases/onTextUseCase";
 
 export class onText implements iOnListener {
-  private readonly _bot: TelegramBot;
-  private readonly _onTextUseCase: iUseCase;
+  private readonly telegramBot: TelegramBot;
+  private readonly onTextUseCase: iUseCase;
 
-  constructor(bot: TelegramBot, userRepository: iReporitory) {
-    this._bot = bot;
+  constructor(bot: TelegramBot, userRepository: iRepository) {
+    this.telegramBot = bot;
     // this.bot.sendMessage(407836459, 'I\'m ready to start');
-    this._onTextUseCase = new onTextUseCase(this._bot, userRepository);
+    this.onTextUseCase = new onTextUseCase(this.telegramBot, userRepository);
     this.setListener();
   }
 
   setListener() {
-    this._bot.on('text', this._onTextUseCase.execute.bind(this._onTextUseCase));
+    this.telegramBot.on('text', this.onTextUseCase.execute.bind(this.onTextUseCase));
   }
 
 }

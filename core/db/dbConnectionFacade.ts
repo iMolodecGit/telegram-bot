@@ -1,17 +1,15 @@
 import {mysqlConnection} from "./mysqlConnection";
 import {idbConnection} from "../interfaces";
 
-export class dbConnection {
+export class dbConnectionFacade {
 
-  init(): Promise<idbConnection> {
+  initConnection(): Promise<idbConnection> {
     return this.initMySQLConnection();
   }
 
-  private async initMySQLConnection(): Promise<any> {
+  private initMySQLConnection(): Promise<idbConnection> {
     const mysql = new mysqlConnection();
-
-    return await mysql.createConnection();
+    return mysql.createConnection();
   }
-
 
 }
