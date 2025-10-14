@@ -1,14 +1,11 @@
 import 'dotenv/config';
-import {iBot, idbConnection} from "./core/interfaces";
-import {dbConnectionFacade} from "./core/db/dbConnectionFacade";
-import {BotFacade} from "./bot";
+import {idbConnection} from "./core/interfaces";
+import {DbConnectionFactory} from "./core/db/DbConnectionFactory";
+import {BotFactory} from "./bot";
 
 async function run() {
-
-    let _dbConnectionFacade: any = new dbConnectionFacade();
-    let dbConnection: idbConnection = await _dbConnectionFacade.initConnection();
-    const bot: iBot = new BotFacade(dbConnection);
-    await bot.runBot();
+    let dbConnection: idbConnection = await DbConnectionFactory.createConnection('mysql');
+    await BotFactory.createBot(dbConnection);
 }
 
 

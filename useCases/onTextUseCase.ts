@@ -9,7 +9,7 @@ export class onTextUseCase implements iUseCase {
   private telegramBot: TelegramBot;
   private readonly userRepository: iRepository;
 
-  constructor(bot: TelegramBot, userRepository: iRepository ) {
+  constructor(bot: TelegramBot, userRepository: iRepository) {
     this.telegramBot = bot;
     this.userRepository = userRepository;
   }
@@ -96,9 +96,8 @@ export class onTextUseCase implements iUseCase {
   private async sendImg(msg: Message) {
     let dbData = await this.userRepository.findOneByChatId(msg.chat.id);
 
-
     if (!dbData.length) {
-      console.log('Not found User by chatId', msg.chat.id);
+      await this.messageUserNotFound(msg.chat.id);
       return;
     }
 
@@ -109,6 +108,7 @@ export class onTextUseCase implements iUseCase {
 
     if (!fileName) {
       console.log('Photo is empty. Chat id: ', msg.chat.id, 'User name', msg.from?.username);
+      await this.messageImageNotFound(msg.chat.id);
     }
     const filePath = `${baseDir}/${msg.chat.id}/${fileName}`;
 
@@ -118,7 +118,7 @@ export class onTextUseCase implements iUseCase {
       await this.telegramBot.sendPhoto(msg.chat.id, imageBuffer, {
         caption: '<b>Your image is here</b>',
         parse_mode: 'HTML'
-      },{
+      }, {
         // Explicitly specify the file name.
         filename: 'image.jpg',
         // Explicitly specify the MIME type.
@@ -126,10 +126,27 @@ export class onTextUseCase implements iUseCase {
       });
     } catch {
       console.log('Photo is forbidden. Chat id: ', msg.chat.id, 'User name', msg.from?.username);
-      await this.telegramBot.sendMessage(msg.chat.id, '<b>Oops! Your image is not found</b>', {
-        parse_mode: 'HTML'
-      });
+      await this.messageImageNotFound(msg.chat.id);
     }
-
   }
+
+  messageImageNotFound(chatId: number) {
+    return this.telegramBot.sendMessage(chatId, '<b>Oops! Your image is not found</b>', {
+      parse_mode: 'HTML'
+    });
+  }
+
+  messageUserNotFound(chatId: number) {
+    console.log('Not found User by chatId', chatId);
+    return this.telegramBot.sendMessage(chatId, '<b>Oops! Your user is not found. Please click button below</b>', {
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [{text: 'Проверить Подписку', callback_data: 'checkSubs'}],
+          [{text: 'Закрыть Меню', callback_data: 'closeMenu'}]
+        ]
+      }
+    });
+  }
+
 }
