@@ -2,7 +2,7 @@
 import {iOnListener,} from "../core/interfaces";
 import TelegramBot from "node-telegram-bot-api";
 
-export class onError implements iOnListener {
+export class onErrorEvent implements iOnListener {
   private readonly telegramBot: TelegramBot;
 
   constructor(bot: TelegramBot) {

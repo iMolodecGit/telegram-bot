@@ -1,6 +1,7 @@
 import {iDbConnection, iRepository} from "../core/interfaces";
-import {UserEntity} from "../core/entities/user.entity";
-import {ResultSetHeader} from "mysql2";
+import {UserEntity} from "../domain/entities/user.entity";
+import {UserMapper} from "../core/mappers/user.mapper";
+import {UserRowDto} from "../core/dto/userRow.dto";
 
 export class UserRepository implements iRepository{
   private _dbConnection: iDbConnection;
@@ -10,32 +11,30 @@ export class UserRepository implements iRepository{
 
   async findOneByChatId(chatId:number) {
     try {
-      const [results, fields] = await this._dbConnection.query(
+      const [results] = await this._dbConnection.query(
         'SELECT * FROM `user` where chat_id = ? LIMIT 1',
         [chatId]
       );
 
-      // console.log(results); // results contains rows returned by server
-      // console.log(fields); // fields contains extra meta data about results, if available
+      if (results.length == 0 ) {
+        return null;
+      }
 
-      return results;
+      return UserMapper.toEntity(results[0]);
     } catch (err) {
       console.log(err);
     }
 
-    return [];
+    return null;
   }
 
-  async getAll() {
+  async getAll():Promise<UserEntity[]> {
     try {
-      const [results, fields] = await this._dbConnection.query(
+      const [results] = await this._dbConnection.query(
         'SELECT * FROM `user`'
       );
 
-      // console.log(results); // results contains rows returned by server
-      // console.log(fields); // fields contains extra meta data about results, if available
-
-      return results;
+      return results.reduce((item: UserRowDto)=> UserMapper.toEntity(item), []);
     } catch (err) {
       console.log(err);
     }
@@ -44,25 +43,26 @@ export class UserRepository implements iRepository{
   }
 
   async save(user: UserEntity) {
+    const userDto: UserRowDto = UserMapper.toDto(user);
     let results = false;
     try {
-       [results] = await this._dbConnection.query(
+      [results] = await this._dbConnection.query(
         'INSERT IGNORE INTO `user` (`name`, `first_name`, `phone_number`, `chat_id`, `photo_1`)\n' +
         'VALUES (?, ?, ?, ?, ?);',
-        [user.name, user.first_name, user.phone_number, user.chat_id, user.photo_1]
+        [userDto.name, userDto.first_name, userDto.phone_number, userDto.chat_id, userDto.photo_1]
       );
-
       console.log('Save User result', results);
     } catch (err) {
       console.log(err);
     }
+
     return results;
   }
 
-  async updatePhoto(chatId: number, value: any) {
+  async updatePhoto(chatId: number, value: string|null) {
 
     try {
-      let [results] = await this._dbConnection.query(
+      const [results] = await this._dbConnection.query(
         'UPDATE `user` SET photo_1 = ? where chat_id = ?',
         [value, chatId]
       );

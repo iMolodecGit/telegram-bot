@@ -2,11 +2,14 @@
   "name": "telegram-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.ts",
-    "start": "node index.ts"
+    "dev": "nodemon src/index.ts",
+    "start": "node src/index.ts",
+    "lint": "npx eslint 'src/**/*.ts'",
+    "dev:lint": "nodemon --watch src --ext ts --exec \"npx eslint src/**/*.ts && ts-node src/index.ts\"",
+    "dev:concur:lint": "concurrently \"npx eslint 'src/**/*.ts' --watch\" \"nodemon src/index.ts\""
   },
   "author": "",
   "license": "ISC",
@@ -18,7 +21,14 @@
     "nodemon": "^3.1.10"
   },
   "devDependencies": {
+    "@eslint/js": "^9.37.0",
     "@types/node-telegram-bot-api": "^0.64.11",
-    "i": "^0.3.7"
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "eslint": "^9.37.0",
+    "globals": "^16.4.0",
+    "i": "^0.3.7",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.46.1"
   }
 }

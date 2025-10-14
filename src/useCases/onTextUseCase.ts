@@ -1,8 +1,7 @@
 import {iRepository, iUseCase} from "../core/interfaces";
 import TelegramBot, {Message} from "node-telegram-bot-api";
 import fs from "fs";
-import {UserMapper} from "../core/mappers/user.mapper";
-import {UserEntity} from "../core/entities/user.entity";
+import {UserEntity} from "../domain/entities/user.entity";
 
 export class onTextUseCase implements iUseCase {
 
@@ -39,7 +38,8 @@ export class onTextUseCase implements iUseCase {
 
   private async processDefaultText(msg: Message) {
     console.log(msg);
-    let text: string = msg.text ?? '';
+
+    const text: string = msg.text ?? '';
     const msgWait = await this.telegramBot.sendMessage(msg.chat.id, `Бот генерирует ответ...`);
 
     setTimeout(async () => {
@@ -51,9 +51,11 @@ export class onTextUseCase implements iUseCase {
   private async startAction(msg: Message) {
     await this.telegramBot.sendMessage(msg.chat.id, `You start the iMolodec bot!`);
 
-    let text: string = msg.text ?? '';
+    const text: string = msg.text ?? '';
+
     if (text.length > 6) {
       const refID = text.slice(7);
+
       await this.telegramBot.sendMessage(msg.chat.id, `You've opened the bot by ref from user ID ${refID}`);
     }
   }
@@ -94,27 +96,30 @@ export class onTextUseCase implements iUseCase {
   }
 
   private async sendImg(msg: Message) {
-    let dbData = await this.userRepository.findOneByChatId(msg.chat.id);
+    const user: UserEntity = await this.userRepository.findOneByChatId(msg.chat.id);
 
-    if (!dbData.length) {
+    if (!user) {
       await this.messageUserNotFound(msg.chat.id);
+
       return;
     }
 
-    let user: UserEntity = UserMapper.toEntity(dbData[0]);
-
     const baseDir = './photo';
+
     const fileName = user.photo_1;
 
     if (!fileName) {
       console.log('Photo is empty. Chat id: ', msg.chat.id, 'User name', msg.from?.username);
       await this.messageImageNotFound(msg.chat.id);
     }
+
     const filePath = `${baseDir}/${msg.chat.id}/${fileName}`;
 
     try {
       fs.accessSync(filePath);
+
       const imageBuffer = fs.readFileSync(filePath);
+
       await this.telegramBot.sendPhoto(msg.chat.id, imageBuffer, {
         caption: '<b>Your image is here</b>',
         parse_mode: 'HTML'
@@ -138,6 +143,7 @@ export class onTextUseCase implements iUseCase {
 
   messageUserNotFound(chatId: number) {
     console.log('Not found User by chatId', chatId);
+
     return this.telegramBot.sendMessage(chatId, '<b>Oops! Your user is not found. Please click button below</b>', {
       parse_mode: 'HTML',
       reply_markup: {

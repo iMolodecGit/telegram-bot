@@ -29,6 +29,7 @@ export class BotFactory {
 
   private static initBotListeners(bot: TelegramBot, dbConnection: iDbConnection) {
     const botListeners = new BotListeners(bot);
+
     botListeners.init(dbConnection);
   }
 }

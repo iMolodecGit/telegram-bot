@@ -3,7 +3,7 @@ export interface iOnListener {
 }
 
 export interface iBotListener {
-  init(dbConnection: any): void
+  init(dbConnection: iDbConnection): void
 }
 
 export interface iDbConnection {

@@ -3,8 +3,8 @@ import TelegramBot, {Message, Metadata, PhotoSize} from "node-telegram-bot-api";
 import fs from "fs";
 
 const baseDir = `photo`;
-export class onPhotoUseCase implements iUseCase {
 
+export class onPhotoUseCase implements iUseCase {
   private readonly telegramBot: TelegramBot;
   private readonly userRepository: iRepository;
   constructor(bot: TelegramBot, userRepository: iRepository) {
@@ -16,25 +16,30 @@ export class onPhotoUseCase implements iUseCase {
     try {
       if (!msg.photo) {
         console.log('Photo is empty', metadata);
+
         return;
       }
 
-      let chatId: number = msg.chat.id;
-      let dir = this.createDownloadFolder(chatId);
-      let fileName: string = await this.downloadPhoto(msg, dir);
+      const chatId: number = msg.chat.id;
+
+      const dir = this.createDownloadFolder(chatId);
+
+      const fileName: string = await this.downloadPhoto(msg, dir);
 
       if (!fileName) {
         console.log('Download file error');
+
         return;
       }
 
-      let result = await this.userRepository.updatePhoto(msg.chat.id, fileName);
+      const result = await this.userRepository.updatePhoto(msg.chat.id, fileName);
 
       if (result) {
         console.log(`File saved from ${msg.chat.first_name} saved. Chat Id ${msg.chat.id}`);
       } else {
         console.error(`Error during file save from ${msg.chat.first_name}. Chat Id ${msg.chat.id}`);
       }
+
       await this.telegramBot.sendMessage(msg.chat.id, `Your photo saved!`);
     }
     catch(error) {
@@ -45,25 +50,30 @@ export class onPhotoUseCase implements iUseCase {
   private async downloadPhoto(msg: Message, dir: string) {
 
     let fileName = '';
+
     try {
       if (!msg.photo) {
         console.log('Photo is empty');
+
         return fileName;
       }
 
-      let photo: PhotoSize = msg.photo[msg.photo.length - 1];
+      const photo: PhotoSize = msg.photo[msg.photo.length - 1];
 
-      let fileId = photo.file_id;
+      const fileId = photo.file_id;
 
-      let filePath = await this.telegramBot.downloadFile(fileId, dir);
+      const filePath = await this.telegramBot.downloadFile(fileId, dir);
 
-      let filePathStructure = filePath.split('/');
+      const filePathStructure = filePath.split('/');
+
       fileName = filePathStructure[filePathStructure.length - 1];
       console.log('Download File', fileName);
+
       return fileName;
     } catch (error) {
       console.log('Download file error', error);
     }
+
     return fileName;
   }
 

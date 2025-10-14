@@ -16,6 +16,7 @@ export class MySqlConnection implements iDbConnection{
     if (!this.connection) {
       await this.connect();
     }
+
     return this.connection!;
   }
 
@@ -27,6 +28,7 @@ export class MySqlConnection implements iDbConnection{
       // Обработчик потери соединения
       this.connection.on('error', async (err: any) => {
         console.error('⚠️ MySQL connection error:', err.code);
+
         if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.fatal) {
           console.log('🔁 Reconnecting to MySQL...');
           await this.reconnect();
@@ -45,15 +47,19 @@ export class MySqlConnection implements iDbConnection{
 
   async query(sql: string, params?: any[]): Promise<any> {
     const conn = await this.createConnection();
+
     try {
       return conn.query(sql, params);
     } catch (err: any) {
       if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.fatal) {
         console.log('🔄 Reconnecting and retrying query...');
         await this.reconnect();
+
         const newConn = await this.createConnection();
+
         return newConn.query(sql, params);
       }
+
       throw err;
     }
   }
