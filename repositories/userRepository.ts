@@ -1,10 +1,10 @@
-import {idbConnection, iRepository} from "../core/interfaces";
+import {iDbConnection, iRepository} from "../core/interfaces";
 import {UserEntity} from "../core/entities/user.entity";
 import {ResultSetHeader} from "mysql2";
 
 export class UserRepository implements iRepository{
-  private _dbConnection: idbConnection;
-  constructor(dbConnection: idbConnection) {
+  private _dbConnection: iDbConnection;
+  constructor(dbConnection: iDbConnection) {
     this._dbConnection = dbConnection;
   }
 

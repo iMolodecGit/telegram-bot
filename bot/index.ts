@@ -1,12 +1,12 @@
 import 'dotenv/config';
-import { idbConnection } from '../core/interfaces';
+import { iDbConnection } from '../core/interfaces';
 import { BotListeners } from '../listeners';
 import TelegramBot from 'node-telegram-bot-api';
 
 const API_KEY_BOT = process.env.API_KEY_BOT!;
 
 export class BotFactory {
-  static async createBot(dbConnection: idbConnection): Promise<TelegramBot> {
+  static async createBot(dbConnection: iDbConnection): Promise<TelegramBot> {
     const telegramBot = new TelegramBot(API_KEY_BOT, {
       polling: {
         interval: 300,
@@ -27,7 +27,7 @@ export class BotFactory {
     ]);
   }
 
-  private static initBotListeners(bot: TelegramBot, dbConnection: idbConnection) {
+  private static initBotListeners(bot: TelegramBot, dbConnection: iDbConnection) {
     const botListeners = new BotListeners(bot);
     botListeners.init(dbConnection);
   }

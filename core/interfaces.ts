@@ -6,13 +6,9 @@ export interface iBotListener {
   init(dbConnection: any): void
 }
 
-export interface idbConnection {
+export interface iDbConnection {
+  createConnection: any,
   query: any
-}
-
-export interface iBot{
-  runBot: any,
-  setMyCommands: any
 }
 
 export interface iUseCase{

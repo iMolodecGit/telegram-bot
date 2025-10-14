@@ -1,6 +1,6 @@
 import {onText} from "./onText";
 import {onError} from "./onError";
-import {iBotListener, idbConnection, iRepository} from "../core/interfaces";
+import {iBotListener, iDbConnection, iRepository} from "../core/interfaces";
 import {onContact} from "./onContact";
 import {onLocation} from "./onLocation";
 import {onPhoto} from "./onPhoto";
@@ -12,7 +12,7 @@ export class BotListeners implements iBotListener {
         this.telegramBot = bot;
     }
 
-    init( dbConnection: idbConnection ) {
+    init( dbConnection: iDbConnection ) {
 
         let _userRepository: iRepository = new UserRepository(dbConnection);
         const onTextListener = new onText(this.telegramBot, _userRepository);

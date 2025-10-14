@@ -1,14 +1,15 @@
-import {mysqlConnection} from "./mysqlConnection";
-import {idbConnection} from "../interfaces";
+import {MySqlConnection} from "./MySqlConnection";
+import {iDbConnection} from "../interfaces";
 
 export type DbType = 'mysql' | 'postgres' | 'sqlite';
 
 export class DbConnectionFactory {
-  static createConnection(type: DbType): Promise<idbConnection> {
+  static async createConnection(type: DbType): Promise<iDbConnection> {
     switch (type) {
       case 'mysql': {
-        const mysql = new mysqlConnection();
-        return mysql.createConnection();
+        const mysql = new MySqlConnection();
+        await mysql.createConnection();
+        return mysql;
       }
       // case 'postgres': {
       //   const pg = new postgresConnection();
