@@ -1,3 +1,5 @@
+import * as grpc from "@grpc/grpc-js";
+
 export interface iOnListener {
   setListener(): void
 }
@@ -20,5 +22,12 @@ export interface iRepository {
   getAll: any,
   save: any,
   updatePhoto: any,
+}
+
+export interface iLLMService extends grpc.Client {
+  Ask(
+    request: { question: string },
+    callback: (error: grpc.ServiceError | null, response: { answer: string }) => void
+  ): grpc.ClientUnaryCall;
 }
 

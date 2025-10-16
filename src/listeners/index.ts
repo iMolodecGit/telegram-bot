@@ -1,20 +1,23 @@
-import {onText} from "./onText";
-import {onErrorEvent} from "./onErrorEvent";
-import {iBotListener, iDbConnection, iRepository} from "../core/interfaces";
-import {onContactEvent} from "./onContactEvent";
-import {onLocationEvent} from "./onLocationEvent";
-import {onPhotoEvent} from "./onPhotoEvent";
-import {UserRepository} from "../repositories/userRepository";
+import {onText} from "./onText.ts";
+import {onErrorEvent} from "./onErrorEvent.ts";
+import type {iBotListener, iDbConnection, iRepository} from "../core/interfaces.ts";
+import {onContactEvent} from "./onContactEvent.ts";
+import {onLocationEvent} from "./onLocationEvent.ts";
+import {onPhotoEvent} from "./onPhotoEvent.ts";
+import {UserRepository} from "../repositories/userRepository.ts";
 import TelegramBot from "node-telegram-bot-api";
+import {LLMServiceClient} from "../grpc/warehouse.ts";
 export class BotListeners implements iBotListener {
   private readonly telegramBot: TelegramBot;
-  constructor(bot: TelegramBot) {
+  private readonly llmClient: LLMServiceClient;
+  constructor(bot: TelegramBot, llmClient: LLMServiceClient) {
     this.telegramBot = bot;
+    this.llmClient = llmClient;
   }
 
   init( dbConnection: iDbConnection ) {
     const _userRepository: iRepository = new UserRepository(dbConnection);
-    new onText(this.telegramBot, _userRepository);
+    new onText(this.telegramBot, _userRepository, this.llmClient);
     new onErrorEvent(this.telegramBot);
     new onContactEvent(this.telegramBot, _userRepository);
     new onLocationEvent(this.telegramBot);

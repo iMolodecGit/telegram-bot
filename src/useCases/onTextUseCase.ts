@@ -1,19 +1,22 @@
-import {iRepository, iUseCase} from "../core/interfaces";
-import TelegramBot, {Message} from "node-telegram-bot-api";
+import type {iRepository, iUseCase} from "../core/interfaces.ts";
+import * as TelegramBot from "node-telegram-bot-api";
 import fs from "fs";
-import {UserEntity} from "../domain/entities/user.entity";
+import {UserEntity} from "../domain/entities/user.entity.ts";
+import {LLMServiceClient} from "../grpc/warehouse.ts";
 
 export class onTextUseCase implements iUseCase {
 
   private telegramBot: TelegramBot;
   private readonly userRepository: iRepository;
+  private readonly llmClient: LLMServiceClient;
 
-  constructor(bot: TelegramBot, userRepository: iRepository) {
+  constructor(bot: TelegramBot, userRepository: iRepository, llmClient: LLMServiceClient) {
     this.telegramBot = bot;
     this.userRepository = userRepository;
+    this.llmClient = llmClient;
   }
 
-  async execute(msg: Message) {
+  async execute(msg: TelegramBot.Message) {
 
     try {
       if (msg.text?.startsWith('/start')) {
@@ -36,19 +39,31 @@ export class onTextUseCase implements iUseCase {
     }
   }
 
-  private async processDefaultText(msg: Message) {
-    console.log(msg);
+  private async processDefaultText(msg: TelegramBot.Message) {
+    console.log(msg)
 
     const text: string = msg.text ?? '';
     const msgWait = await this.telegramBot.sendMessage(msg.chat.id, `Бот генерирует ответ...`);
+    ;
 
-    setTimeout(async () => {
+    this.llmClient.Ask({ question: text }, async (err: any, response: any) => {
+      if (err) return console.error('❌ Ошибка:', err.message);
+
       await this.telegramBot.deleteMessage(msgWait.chat.id, msgWait.message_id);
-      await this.telegramBot.sendMessage(msg.chat.id, text);
-    }, 2500);
+      await this.telegramBot.sendMessage(msg.chat.id, response.answer);
+
+      console.log('✅ Ответ:', response.answer);
+      console.log('📦 Результаты:', response.json_results);
+    });
+
+
+    // setTimeout(async () => {
+    //   await this.telegramBot.deleteMessage(msgWait.chat.id, msgWait.message_id);
+    //   await this.telegramBot.sendMessage(msg.chat.id, text);
+    // }, 2500);
   }
 
-  private async startAction(msg: Message) {
+  private async startAction(msg: TelegramBot.Message) {
     await this.telegramBot.sendMessage(msg.chat.id, `You start the iMolodec bot!`);
 
     const text: string = msg.text ?? '';
@@ -60,11 +75,11 @@ export class onTextUseCase implements iUseCase {
     }
   }
 
-  private async refAction(msg: Message) {
+  private async refAction(msg: TelegramBot.Message) {
     await this.telegramBot.sendMessage(msg.chat.id, `${process.env.URL_TO_BOT}?start=${msg.from?.id}`);
   }
 
-  private async helpAction(msg: Message) {
+  private async helpAction(msg: TelegramBot.Message) {
     await this.telegramBot.sendMessage(msg.chat.id, `Раздел помощи HTML\n\n<b>Жирный Текст</b>\n<i>Текст Курсивом</i>\n<code>Текст с Копированием</code>\n<s>Перечеркнутый текст</s>\n<u>Подчеркнутый текст</u>\n<pre language='c++'>код на c++</pre>\n<a href='t.me'>Гиперссылка</a>`, {
       parse_mode: "HTML"
     });
@@ -74,7 +89,7 @@ export class onTextUseCase implements iUseCase {
     });
   }
 
-  private async menuAction(msg: Message) {
+  private async menuAction(msg: TelegramBot.Message) {
     await this.telegramBot.sendMessage(msg.chat.id, `Меню бота`, {
       reply_markup: {
         keyboard: [
@@ -87,7 +102,7 @@ export class onTextUseCase implements iUseCase {
     })
   }
 
-  private async closeMenuAction(msg: Message) {
+  private async closeMenuAction(msg: TelegramBot.Message) {
     await this.telegramBot.sendMessage(msg.chat.id, 'Меню закрыто', {
       reply_markup: {
         remove_keyboard: true
@@ -95,7 +110,7 @@ export class onTextUseCase implements iUseCase {
     })
   }
 
-  private async sendImg(msg: Message) {
+  private async sendImg(msg: TelegramBot.Message) {
     const user: UserEntity = await this.userRepository.findOneByChatId(msg.chat.id);
 
     if (!user) {

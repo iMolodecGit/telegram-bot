@@ -1,5 +1,5 @@
-import {MySqlConnection} from "./mySqlConnection";
-import {iDbConnection} from "../interfaces";
+import {MySqlConnection} from "./mySqlConnection.ts";
+import type {iDbConnection} from "../interfaces.ts";
 
 export type DbType = 'mysql' | 'postgres' | 'sqlite';
 

@@ -1,7 +1,7 @@
-import {iDbConnection, iRepository} from "../core/interfaces";
-import {UserEntity} from "../domain/entities/user.entity";
-import {UserMapper} from "../core/mappers/user.mapper";
-import {UserRowDto} from "../core/dto/userRow.dto";
+import type {iDbConnection, iRepository} from "../core/interfaces.ts";
+import {UserEntity} from "../domain/entities/user.entity.ts";
+import {UserMapper} from "../core/mappers/user.mapper.ts";
+import {UserRowDto} from "../core/dto/userRow.dto.ts";
 
 export class UserRepository implements iRepository{
   private _dbConnection: iDbConnection;
