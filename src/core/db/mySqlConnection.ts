@@ -1,8 +1,8 @@
-import mysql, { Connection } from 'mysql2/promise';
-import {iDbConnection} from "../interfaces";
+import * as mysql from 'mysql2/promise';
+import type {iDbConnection} from "../interfaces.ts";
 
 export class MySqlConnection implements iDbConnection{
-  private connection: Connection | null = null;
+  private connection: mysql.Connection | null = null;
   private readonly config = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -12,7 +12,7 @@ export class MySqlConnection implements iDbConnection{
 
   constructor() {}
 
-  async createConnection(): Promise<Connection> {
+  async createConnection(): Promise<mysql.Connection> {
     if (!this.connection) {
       await this.connect();
     }

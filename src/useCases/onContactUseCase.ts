@@ -1,6 +1,6 @@
-import {iRepository, iUseCase} from "../core/interfaces";
-import TelegramBot, {Message} from "node-telegram-bot-api";
-import {TelegramMessageUserMapper} from "../core/mappers/telegramMessageUser.mapper";
+import type {iRepository, iUseCase} from "../core/interfaces.ts";
+import * as TelegramBot from "node-telegram-bot-api";
+import {TelegramMessageUserMapper} from "../core/mappers/telegramMessageUser.mapper.ts";
 
 export class onContactUseCase implements iUseCase {
 
@@ -11,7 +11,7 @@ export class onContactUseCase implements iUseCase {
     this.userRepository = userRepository;
   }
 
-  async execute(msg: Message) {
+  async execute(msg: TelegramBot.Message) {
     try {
 
       const user = TelegramMessageUserMapper.toEntity(msg);

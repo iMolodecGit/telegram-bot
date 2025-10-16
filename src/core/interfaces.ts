@@ -21,4 +21,3 @@ export interface iRepository {
   save: any,
   updatePhoto: any,
 }
-

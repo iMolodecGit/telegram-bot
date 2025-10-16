@@ -1,7 +1,7 @@
 
-import {iOnListener, iRepository, iUseCase,} from "../core/interfaces";
+import type {iOnListener, iRepository, iUseCase,} from "../core/interfaces.ts";
 import TelegramBot from "node-telegram-bot-api";
-import {onContactUseCase} from "../useCases/onContactUseCase";
+import {onContactUseCase} from "../useCases/onContactUseCase.ts";
 
 export class onContactEvent implements iOnListener {
   private readonly telegramBot: TelegramBot;
