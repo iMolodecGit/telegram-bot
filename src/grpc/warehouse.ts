@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v2.7.7
 //   protoc               v6.32.1
-// source: grpc/warehouse.proto
+// source: warehouse.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
@@ -156,10 +156,20 @@ export const LLMServiceService = {
     responseSerialize: (value: AskResponse): Buffer => Buffer.from(AskResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): AskResponse => AskResponse.decode(value),
   },
+  askScientist: {
+    path: "/llm.LLMService/AskScientist",
+    requestStream: false,
+    responseStream: false,
+    requestSerialize: (value: AskRequest): Buffer => Buffer.from(AskRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): AskRequest => AskRequest.decode(value),
+    responseSerialize: (value: AskResponse): Buffer => Buffer.from(AskResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): AskResponse => AskResponse.decode(value),
+  },
 } as const;
 
 export interface LLMServiceServer extends UntypedServiceImplementation {
   ask: handleUnaryCall<AskRequest, AskResponse>;
+  askScientist: handleUnaryCall<AskRequest, AskResponse>;
 }
 
 export interface LLMServiceClient extends Client {
@@ -170,6 +180,21 @@ export interface LLMServiceClient extends Client {
     callback: (error: ServiceError | null, response: AskResponse) => void,
   ): ClientUnaryCall;
   ask(
+    request: AskRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: AskResponse) => void,
+  ): ClientUnaryCall;
+  askScientist(
+    request: AskRequest,
+    callback: (error: ServiceError | null, response: AskResponse) => void,
+  ): ClientUnaryCall;
+  askScientist(
+    request: AskRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: AskResponse) => void,
+  ): ClientUnaryCall;
+  askScientist(
     request: AskRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,

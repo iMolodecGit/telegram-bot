@@ -10,7 +10,8 @@
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "lint": "npx eslint 'src/**/*.ts'",
     "dev:lint": "nodemon --watch src --ext ts --exec \"npx eslint src/**/*.ts && ts-node src/index.ts\"",
-    "dev:concur:lint": "concurrently \"npx eslint 'src/**/*.ts' --watch\" \"nodemon src/index.ts\""
+    "dev:concur:lint": "concurrently \"npx eslint 'src/**/*.ts' --watch\" \"nodemon src/index.ts\"",
+    "grpc:types": "npx protoc \\\n  --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \\\n  --ts_proto_out=./src/grpc \\\n  --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true,outputClientImpl=grpc-js \\\n  -I ./grpc \\\n  ./grpc/warehouse.proto"
   },
   "author": "",
   "license": "ISC",

@@ -46,7 +46,7 @@ export class onTextUseCase implements iUseCase {
     const msgWait = await this.telegramBot.sendMessage(msg.chat.id, `Бот генерирует ответ...`);
     ;
 
-    this.llmClient.Ask({ question: text }, async (err: any, response: any) => {
+    this.llmClient.AskScientist({ question: text }, async (err: any, response: any) => {
       if (err) return console.error('❌ Ошибка:', err.message);
 
       await this.telegramBot.deleteMessage(msgWait.chat.id, msgWait.message_id);
