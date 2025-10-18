@@ -3,7 +3,6 @@ import type {iDbConnection} from "./core/interfaces.ts";
 import {DbConnectionFactory} from "./core/db/dbConnectionFactory.ts";
 import {BotFactory} from "./bot/index.ts";
 import {LlmClientFactory} from "./llmClient/LlmClientFactory.ts";
-const grpc = await import('@grpc/grpc-js');
 
 async function run() {
   const dbConnection: iDbConnection = await DbConnectionFactory.createConnection('mysql');

@@ -2,7 +2,7 @@ import type {iRepository, iUseCase} from "../core/interfaces.ts";
 import * as TelegramBot from "node-telegram-bot-api";
 import fs from "fs";
 import {UserEntity} from "../domain/entities/user.entity.ts";
-import {LLMServiceClient} from "../grpc/warehouse.ts";
+import type {LLMServiceClient} from "../grpc/warehouse.ts";
 
 export class onTextUseCase implements iUseCase {
 
@@ -49,18 +49,22 @@ export class onTextUseCase implements iUseCase {
     this.llmClient.AskScientist({ question: text }, async (err: any, response: any) => {
       if (err) return console.error('❌ Ошибка:', err.message);
 
+    this.llmClient.askScientist({ question: text }, async (err: any, response: any) => {
+      if (err) return console.error('❌ Ошибка:', err.message);
+
+      let answer = response.answer;
+
+      if (!answer) {
+        console.error('Answer is empty', response);
+        answer = "Come again pleas, I faced issue with correct answer";
+      }
+
       await this.telegramBot.deleteMessage(msgWait.chat.id, msgWait.message_id);
-      await this.telegramBot.sendMessage(msg.chat.id, response.answer);
+      await this.telegramBot.sendMessage(msg.chat.id, answer);
 
       console.log('✅ Ответ:', response.answer);
       console.log('📦 Результаты:', response.json_results);
     });
-
-
-    // setTimeout(async () => {
-    //   await this.telegramBot.deleteMessage(msgWait.chat.id, msgWait.message_id);
-    //   await this.telegramBot.sendMessage(msg.chat.id, text);
-    // }, 2500);
   }
 
   private async startAction(msg: TelegramBot.Message) {
@@ -80,7 +84,7 @@ export class onTextUseCase implements iUseCase {
   }
 
   private async helpAction(msg: TelegramBot.Message) {
-    await this.telegramBot.sendMessage(msg.chat.id, `Раздел помощи HTML\n\n<b>Жирный Текст</b>\n<i>Текст Курсивом</i>\n<code>Текст с Копированием</code>\n<s>Перечеркнутый текст</s>\n<u>Подчеркнутый текст</u>\n<pre language='c++'>код на c++</pre>\n<a href='t.me'>Гиперссылка</a>`, {
+    await this.telegramBot.sendMessage(msg.chat.id, `Раздел помощи HTML\n\n<b>Жирный Текст</b>\n<i>Текст Курсивом</i>\n<code>Текст с Копированием</code>\n<s>Перечеркнутый текст</s>\n<u>Подчеркнутый текст</u>\n<pre language='c++'>код на c++</pre>\n<a href='https://t.me'>Гиперссылка</a>`, {
       parse_mode: "HTML"
     });
 
