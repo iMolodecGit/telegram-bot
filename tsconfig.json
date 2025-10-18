@@ -1,10 +1,20 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "esModuleInterop": true,
+    "target": "ES2022",                 // современный JS, поддерживает top-level await
+    "module": "NodeNext",                 // ES модули
+    "moduleResolution": "NodeNext",     // резолв путей как в Node.js ESM
+    "esModuleInterop": true,             // чтобы можно было делать import pkg from 'pkg'
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true
-  }
+    "strict": true,                      // строгая типизация
+    "skipLibCheck": true,                // пропускаем проверку типов библиотек
+//    "noImplicitAny": true,               // запрещаем неявный any
+//    "resolveJsonModule": true,           // поддержка импорта json
+//    "allowJs": true,                     // разрешает импорт .js файлов
+    "baseUrl": "./src",                  // базовая папка для алиасов
+    "paths": { "*": ["*"] },             // поддержка алиасов без расширения
+//    "allowSyntheticDefaultImports": true // чтобы корректно работали default импорты из CJS
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

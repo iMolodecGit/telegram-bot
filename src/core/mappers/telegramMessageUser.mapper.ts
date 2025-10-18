@@ -1,9 +1,9 @@
-import { Message } from 'node-telegram-bot-api';
-import { UserRowDto } from '../dto/userRow.dto';
-import {UserEntity} from "../../domain/entities/user.entity";
+import * as TelegramBot from 'node-telegram-bot-api';
+import { UserRowDto } from '../dto/userRow.dto.ts';
+import {UserEntity} from "../../domain/entities/user.entity.ts";
 
 export class TelegramMessageUserMapper {
-  static toDto(message: Message): UserRowDto {
+  static toDto(message: TelegramBot.Message): UserRowDto {
     const userRowDto = new UserRowDto();
 
     userRowDto.name = message.chat.username;
@@ -15,7 +15,7 @@ export class TelegramMessageUserMapper {
     return userRowDto;
   }
 
-  public static toEntity(message: Message): UserEntity {
+  public static toEntity(message: TelegramBot.Message): UserEntity {
     const user: UserEntity = new UserEntity();
 
     user.name = message.chat.username;

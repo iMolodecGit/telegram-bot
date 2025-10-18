@@ -1,21 +1,26 @@
 {
   "name": "telegram-bot",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
-    "start": "node src/index.ts",
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "lint": "npx eslint 'src/**/*.ts'",
     "dev:lint": "nodemon --watch src --ext ts --exec \"npx eslint src/**/*.ts && ts-node src/index.ts\"",
-    "dev:concur:lint": "concurrently \"npx eslint 'src/**/*.ts' --watch\" \"nodemon src/index.ts\""
+    "dev:concur:lint": "concurrently \"npx eslint 'src/**/*.ts' --watch\" \"nodemon src/index.ts\"",
+    "grpc:types": "npx protoc \\\n  --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto \\\n  --ts_proto_out=./src/grpc \\\n  --ts_proto_opt=outputServices=grpc-js,esModuleInterop=true,outputClientImpl=grpc-js \\\n  -I ./grpc \\\n  ./grpc/warehouse.proto"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.0",
+    "@grpc/proto-loader": "^0.8.0",
     "@types/node": "^24.7.1",
     "dotenv": "^17.2.3",
+    "google-protobuf": "^4.0.0",
     "mysql2": "^3.15.2",
     "node-telegram-bot-api": "^0.66.0",
     "nodemon": "^3.1.10"
@@ -29,6 +34,10 @@
     "globals": "^16.4.0",
     "i": "^0.3.7",
     "jiti": "^2.6.1",
+    "ts-node": "^10.9.2",
+    "ts-proto": "^2.7.7",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1"
   }
 }

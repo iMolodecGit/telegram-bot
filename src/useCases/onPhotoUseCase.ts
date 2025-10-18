@@ -1,5 +1,5 @@
-import { iRepository, iUseCase} from "../core/interfaces";
-import TelegramBot, {Message, Metadata, PhotoSize} from "node-telegram-bot-api";
+import type {iRepository, iUseCase} from "../core/interfaces.ts";
+import * as TelegramBot from "node-telegram-bot-api";
 import fs from "fs";
 
 const baseDir = `photo`;
@@ -12,7 +12,7 @@ export class onPhotoUseCase implements iUseCase {
     this.userRepository = userRepository;
   }
 
-  async execute(msg: Message, metadata: Metadata) {
+  async execute(msg: TelegramBot.Message, metadata: TelegramBot.Metadata) {
     try {
       if (!msg.photo) {
         console.log('Photo is empty', metadata);
@@ -47,7 +47,7 @@ export class onPhotoUseCase implements iUseCase {
     }
   }
 
-  private async downloadPhoto(msg: Message, dir: string) {
+  private async downloadPhoto(msg: TelegramBot.Message, dir: string) {
 
     let fileName = '';
 
@@ -58,7 +58,7 @@ export class onPhotoUseCase implements iUseCase {
         return fileName;
       }
 
-      const photo: PhotoSize = msg.photo[msg.photo.length - 1];
+      const photo: TelegramBot.PhotoSize = msg.photo[msg.photo.length - 1];
 
       const fileId = photo.file_id;
 

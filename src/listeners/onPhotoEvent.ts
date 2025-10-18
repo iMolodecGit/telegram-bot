@@ -1,6 +1,6 @@
-import {iOnListener, iRepository, iUseCase,} from "../core/interfaces";
+import type {iOnListener, iRepository, iUseCase,} from "../core/interfaces.ts";
 import TelegramBot from "node-telegram-bot-api";
-import {onPhotoUseCase} from "../useCases/onPhotoUseCase";
+import {onPhotoUseCase} from "../useCases/onPhotoUseCase.ts";
 
 export class onPhotoEvent implements iOnListener {
   private readonly telegramBot: TelegramBot;

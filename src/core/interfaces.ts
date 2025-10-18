@@ -1,3 +1,5 @@
+import * as grpc from "@grpc/grpc-js";
+
 export interface iOnListener {
   setListener(): void
 }
@@ -21,4 +23,3 @@ export interface iRepository {
   save: any,
   updatePhoto: any,
 }
-

@@ -1,5 +1,4 @@
-
-import {iOnListener,} from "../core/interfaces";
+import type {iOnListener,} from "../core/interfaces.ts";
 import TelegramBot from "node-telegram-bot-api";
 
 export class onErrorEvent implements iOnListener {

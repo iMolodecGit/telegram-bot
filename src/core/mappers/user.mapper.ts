@@ -1,5 +1,5 @@
-import {UserEntity} from "../../domain/entities/user.entity";
-import {UserRowDto} from "../dto/userRow.dto";
+import {UserEntity} from "../../domain/entities/user.entity.ts";
+import {UserRowDto} from "../dto/userRow.dto.ts";
 
 export class UserMapper {
 
