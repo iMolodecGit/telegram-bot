@@ -1,14 +1,14 @@
+import type {LLMServiceClient} from "../grpc/warehouse.js";
+
 const grpc = await import('@grpc/grpc-js');
 const protoLoader = await import('@grpc/proto-loader');
 
 export class LlmClientFactory {
 
-  static async getLlm() {
+  static async getLlmClient(): Promise<LLMServiceClient> {
 
     // Загружаем proto
-    const PROTO_PATH = '/Users/serhiinarozhnyi/www/telegram-bot/grpc/warehouse.proto';
-    console.log('PROTO_PATH', PROTO_PATH);
-    const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
+    const packageDefinition = protoLoader.loadSync(process.env.LLM_PROTO_PATH as string, {
       keepCase: true,
       longs: String,
       enums: String,
@@ -16,7 +16,15 @@ export class LlmClientFactory {
       oneofs: true,
     });
 
-    return grpc.loadPackageDefinition(packageDefinition).llm;
+
+    const llmPackage = grpc.loadPackageDefinition(packageDefinition).llm as any;
+
+    const llmClient: LLMServiceClient = new llmPackage.LLMService(
+      process.env.LLM_PROTO_HOST,
+      grpc.credentials.createInsecure()
+    );
+
+    return llmClient;
 
   }
 }

@@ -23,11 +23,3 @@ export interface iRepository {
   save: any,
   updatePhoto: any,
 }
-
-export interface iLLMService extends grpc.Client {
-  Ask(
-    request: { question: string },
-    callback: (error: grpc.ServiceError | null, response: { answer: string }) => void
-  ): grpc.ClientUnaryCall;
-}
-
